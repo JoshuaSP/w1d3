@@ -1,5 +1,3 @@
-require 'byebug'
-
 class Game
   def initialize(player1 = ComputerPlayer.new, player2 = HumanPlayer.new)
     @players = [player1, player2]
@@ -8,6 +6,7 @@ class Game
   def play_turn(guesser, thinker)
     loop do
       response = thinker.check_guess(guesser.guess)
+      puts response.to_s
       if response.won?
         puts "#{guesser.name} won!"
         break
@@ -21,7 +20,8 @@ class Game
     loop do
       guesser = @players[turns % 2]
       thinker = @players[(turns + 1) % 2]
-      guesser.receive_length(thinker.pick_secret_word)
+      length = guesser.receive_length(thinker.pick_secret_word)
+      puts "_" * length
       play_turn(guesser, thinker)
       turns += 1
     end
@@ -69,6 +69,7 @@ class ComputerPlayer
     @guessed_letters = []
     @secret_length = length
     @pruned_dictionary = @dictionary.select { |word| word.length == length}
+    length
   end
 
   def frequency_hash(dictionary)
@@ -84,7 +85,6 @@ class ComputerPlayer
 
   def guess
     f_hash = frequency_hash(@pruned_dictionary)
-    debugger
     @guessed_letters.each do |letter|
       f_hash.delete(letter)
     end
@@ -120,7 +120,6 @@ class HumanPlayer
   end
 
   def check_guess(guess)
-    puts @response.to_s
     puts "The guess is #{guess}. "
     puts "Enter the positions of the letters separated by commas. "
 
@@ -131,9 +130,8 @@ class HumanPlayer
   end
 
   # Guesser Role
-
   def receive_length(length)
-    puts "_" * length
+    length
   end
 
   def guess
@@ -141,7 +139,6 @@ class HumanPlayer
   end
 
   def handle_guess_response(response)
-    puts response.to_s
   end
 end
 
